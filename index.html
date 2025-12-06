@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity インストールスクリプト</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #58a6ff;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .copy-btn {
+            background: #238636;
+            color: white;
+        }
+        .copy-btn:hover {
+            background: #2ea043;
+        }
+        .download-btn {
+            background: #1f6feb;
+            color: white;
+        }
+        .download-btn:hover {
+            background: #388bfd;
+        }
+        .copied {
+            background: #6e7681 !important;
+        }
+        pre {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            color: #c9d1d9;
+        }
+        .usage {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        .usage h2 {
+            margin-top: 0;
+            color: #58a6ff;
+            font-size: 18px;
+        }
+        .usage code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Antigravity インストールスクリプト</h1>
+
+    <div class="buttons">
+        <button class="copy-btn" onclick="copyScript()">📋 コピー</button>
+        <button class="download-btn" onclick="downloadScript()">⬇️ ダウンロード</button>
+    </div>
+
+    <pre><code id="script-content">#!/bin/bash
+
+# 色付きメッセージ用の設定
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}=== Antigravity インストールスクリプト ===${NC}"
+echo ""
+
+echo -e "${BLUE}[1/6] システムアップデート中...${NC}"
+sudo apt-get update -qq
+echo -e "${GREEN}✓ 完了${NC}"
+echo ""
+
+echo -e "${BLUE}[2/6] システムアップグレード中...${NC}"
+sudo apt-get upgrade -y -qq
+echo -e "${GREEN}✓ 完了${NC}"
+echo ""
+
+echo -e "${BLUE}[3/6] 基本ツールインストール中...${NC}"
+sudo apt-get install -y -qq git npm curl
+echo -e "${GREEN}✓ 完了${NC}"
+echo ""
+
+echo -e "${BLUE}[4/6] Antigravityリポジトリ追加中...${NC}"
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://us-central1-apt.pkg.dev/doc/repo-signing-key.gpg | sudo gpg --dearmor --yes -o /etc/apt/keyrings/antigravity-repo-key.gpg 2>/dev/null
+echo "deb [signed-by=/etc/apt/keyrings/antigravity-repo-key.gpg] https://us-central1-apt.pkg.dev/projects/antigravity-auto-updater-dev/ antigravity-debian main" | sudo tee /etc/apt/sources.list.d/antigravity.list > /dev/null
+echo -e "${GREEN}✓ 完了${NC}"
+echo ""
+
+echo -e "${BLUE}[5/6] パッケージリスト更新中...${NC}"
+sudo apt update -qq
+echo -e "${GREEN}✓ 完了${NC}"
+echo ""
+
+echo -e "${BLUE}[6/6] Antigravityインストール中...${NC}"
+sudo apt install -y antigravity
+echo -e "${GREEN}✓ 完了${NC}"
+echo ""
+
+echo -e "${GREEN}🎉 インストール完了！${NC}"
+echo "起動するには: antigravity"</code></pre>
+
+    <div class="usage">
+        <h2>使い方</h2>
+        <p><strong>方法1:</strong> ダウンロードして実行</p>
+        <pre><code>chmod +x install_antigravity.sh
+./install_antigravity.sh</code></pre>
+
+        <p><strong>方法2:</strong> コピーして貼り付け</p>
+        <pre><code>nano install_antigravity.sh
+# 内容を貼り付けて保存 (Ctrl+O, Enter, Ctrl+X)
+chmod +x install_antigravity.sh
+./install_antigravity.sh</code></pre>
+    </div>
+
+    <script>
+        function copyScript() {
+            const content = document.getElementById('script-content').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✓ コピーしました！';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 コピー';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function downloadScript() {
+            const content = document.getElementById('script-content').textContent;
+            const blob = new Blob([content], { type: 'text/x-shellscript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'install_antigravity.sh';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
+</code></pre></content>
