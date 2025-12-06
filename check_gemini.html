@@ -3,84 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antigravity Geminiチャット診断スクリプト v1.1.0</title>
+    <title>Antigravity Geminiチャット診断 v1.2.0</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
             background: #0d1117;
             color: #c9d1d9;
-            line-height: 1.6;
+            line-height: 1.7;
         }
-        h1 {
-            color: #58a6ff;
-            border-bottom: 1px solid #30363d;
-            padding-bottom: 10px;
+        h1 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+        h2 { color: #58a6ff; font-size: 20px; margin-top: 40px; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+        h3 { color: #8b949e; font-size: 16px; margin-top: 20px; }
+        .version-badge {
+            display: inline-block;
+            background: #238636;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-left: 10px;
+            vertical-align: middle;
         }
-        h2 {
-            color: #8b949e;
-            font-size: 16px;
-            margin-top: 25px;
-        }
-        .info-box {
-            background: #161b22;
-            border: 1px solid #238636;
-            border-left: 4px solid #238636;
-            border-radius: 6px;
-            padding: 16px;
+        .back-link {
+            display: inline-block;
             margin-bottom: 20px;
-        }
-        .info-box h3 {
             color: #58a6ff;
-            margin: 0 0 10px 0;
-            font-size: 14px;
+            text-decoration: none;
         }
-        .info-box ul {
-            margin: 0;
-            padding-left: 20px;
+        .back-link:hover { text-decoration: underline; }
+
+        /* ステップカード */
+        .step-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
         }
-        .info-box li {
-            margin: 5px 0;
+        .step-number {
+            display: inline-block;
+            background: #1f6feb;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            margin-right: 10px;
         }
-        .buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
+        .step-title { font-weight: 600; color: #c9d1d9; }
+
+        /* ボタン */
+        .buttons { display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
         button {
-            padding: 10px 20px;
-            font-size: 14px;
+            padding: 12px 24px;
+            font-size: 15px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
-        .copy-btn {
-            background: #238636;
-            color: white;
-        }
-        .copy-btn:hover {
-            background: #2ea043;
-        }
-        .download-btn {
-            background: #1f6feb;
-            color: white;
-        }
-        .download-btn:hover {
-            background: #388bfd;
-        }
-        .copied {
-            background: #6e7681 !important;
-        }
+        .copy-btn { background: #238636; color: white; }
+        .copy-btn:hover { background: #2ea043; transform: translateY(-1px); }
+        .download-btn { background: #1f6feb; color: white; }
+        .download-btn:hover { background: #388bfd; transform: translateY(-1px); }
+        .copied { background: #6e7681 !important; }
+
+        /* コードブロック */
         pre {
-            background: #161b22;
+            background: #0d1117;
             border: 1px solid #30363d;
             border-radius: 6px;
             padding: 16px;
@@ -91,129 +89,321 @@
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
             color: #c9d1d9;
         }
-        .check-item {
-            color: #7ee787;
+        .script-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #30363d;
+            border-radius: 8px;
         }
-        .warn-item {
-            color: #d29922;
+        .script-container pre {
+            margin: 0;
+            border: none;
         }
-        .error-item {
+
+        /* 問題解決カード */
+        .solution-card {
+            background: #161b22;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .solution-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .solution-header:hover { background: #1c2128; }
+        .solution-icon { font-size: 24px; }
+        .solution-title { font-weight: 600; flex: 1; }
+        .solution-arrow { color: #8b949e; transition: transform 0.2s; }
+        .solution-content {
+            padding: 0 20px 20px 20px;
+            border-top: 1px solid #30363d;
+        }
+
+        /* エラー/警告カラー */
+        .error { border-left: 4px solid #f85149; }
+        .warning { border-left: 4px solid #d29922; }
+        .success { border-left: 4px solid #238636; }
+        .info { border-left: 4px solid #1f6feb; }
+
+        /* チェック項目説明 */
+        .check-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .check-table th, .check-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #30363d;
+        }
+        .check-table th {
+            background: #161b22;
+            color: #8b949e;
+            font-weight: 600;
+        }
+        .check-table tr:hover { background: #161b22; }
+        .check-name { font-weight: 600; color: #58a6ff; }
+
+        /* フローチャート風 */
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 20px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        .flow-step::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: -20px;
+            width: 2px;
+            background: #30363d;
+        }
+        .flow-step:last-child::before { display: none; }
+        .flow-dot {
+            position: absolute;
+            left: 4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #1f6feb;
+        }
+        .flow-content { flex: 1; }
+
+        /* 重要ボックス */
+        .important-box {
+            background: #1c1917;
+            border: 1px solid #f85149;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .important-box h4 {
             color: #f85149;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #58a6ff;
-            text-decoration: none;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
+
         .sources {
-            margin-top: 30px;
+            margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid #30363d;
-            font-size: 12px;
+            font-size: 13px;
             color: #8b949e;
         }
-        .sources a {
-            color: #58a6ff;
-        }
-        .version-badge {
-            display: inline-block;
-            background: #238636;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
+        .sources a { color: #58a6ff; }
     </style>
 </head>
 <body>
     <a href="index.html" class="back-link">← インストールスクリプトに戻る</a>
 
-    <h1>Antigravity Geminiチャット診断 <span class="version-badge">v1.1.0</span></h1>
+    <h1>Antigravity Geminiチャット診断 <span class="version-badge">v1.2.0</span></h1>
 
-    <div class="info-box">
-        <h3>Geminiチャットが動かない場合の主な原因</h3>
-        <ul>
-            <li><strong>Chromeブラウザ</strong>がインストールされていない</li>
-            <li><strong>Googleアカウント認証</strong>が完了していない（個人Gmail必須）</li>
-            <li><strong>glibc/glibcxx</strong>のバージョンが古い</li>
-            <li><strong>ネットワーク接続</strong>の問題</li>
-            <li><strong>設定ファイル</strong>の破損</li>
-        </ul>
+    <p>AntigravityのGeminiチャットが動作しない場合、このページの診断スクリプトを使って原因を特定し、解決できます。</p>
+
+    <!-- ============================================ -->
+    <h2>1. まず確認すること</h2>
+    <!-- ============================================ -->
+
+    <div class="important-box">
+        <h4>⚠️ 最も多い原因</h4>
+        <p style="margin: 0;"><strong>個人のGmailアカウント</strong>でログインしていますか？<br>
+        Antigravityは<strong>組織アカウント（会社・学校のGoogle Workspace）では動作しません</strong>。<br>
+        必ず <code>@gmail.com</code> のアカウントを使用してください。</p>
     </div>
 
-    <h2>診断スクリプト</h2>
+    <div class="step-card info">
+        <span class="step-number">1</span>
+        <span class="step-title">Antigravityを再起動してみる</span>
+        <p style="margin: 10px 0 0 38px;">多くの問題は再起動で解決します。Antigravityを完全に終了し、もう一度起動してください。</p>
+    </div>
+
+    <div class="step-card info">
+        <span class="step-number">2</span>
+        <span class="step-title">チャット欄で「continue」と入力</span>
+        <p style="margin: 10px 0 0 38px;">エージェントが固まっている場合、「continue」または「proceed」と入力すると復帰することがあります。</p>
+    </div>
+
+    <div class="step-card info">
+        <span class="step-number">3</span>
+        <span class="step-title">それでも動かない場合 → 診断スクリプトを実行</span>
+        <p style="margin: 10px 0 0 38px;">下記のスクリプトを実行して、システム環境に問題がないか確認してください。</p>
+    </div>
+
+    <!-- ============================================ -->
+    <h2>2. 診断スクリプト</h2>
+    <!-- ============================================ -->
+
+    <h3>スクリプトがチェックする項目</h3>
+    <table class="check-table">
+        <tr>
+            <th>項目</th>
+            <th>なぜ必要？</th>
+            <th>問題がある場合</th>
+        </tr>
+        <tr>
+            <td class="check-name">glibc</td>
+            <td>Linuxの基本ライブラリ。古いとAntigravityが起動しない</td>
+            <td>OSのアップグレードが必要</td>
+        </tr>
+        <tr>
+            <td class="check-name">GLIBCXX</td>
+            <td>C++ライブラリ。古いと一部機能が動かない</td>
+            <td>OSのアップグレードが必要</td>
+        </tr>
+        <tr>
+            <td class="check-name">Chrome</td>
+            <td>ブラウザエージェント機能とGoogle認証に使用</td>
+            <td>Chromeをインストール</td>
+        </tr>
+        <tr>
+            <td class="check-name">Antigravity</td>
+            <td>本体がインストールされているか確認</td>
+            <td>再インストール</td>
+        </tr>
+        <tr>
+            <td class="check-name">設定ディレクトリ</td>
+            <td>認証情報やユーザー設定の保存場所</td>
+            <td>初回セットアップを実行</td>
+        </tr>
+        <tr>
+            <td class="check-name">ネットワーク</td>
+            <td>Gemini APIへの接続が必要</td>
+            <td>ネットワーク設定を確認</td>
+        </tr>
+        <tr>
+            <td class="check-name">プロセス</td>
+            <td>Antigravityが正常に動作しているか</td>
+            <td>再起動を試す</td>
+        </tr>
+    </table>
+
+    <h3>スクリプトをダウンロード・実行</h3>
     <div class="buttons">
-        <button class="copy-btn" onclick="copyScript()">📋 コピー</button>
-        <button class="download-btn" onclick="downloadScript()">⬇️ ダウンロード</button>
+        <button class="copy-btn" onclick="copyScript()">📋 スクリプトをコピー</button>
+        <button class="download-btn" onclick="downloadScript()">⬇️ ファイルとしてダウンロード</button>
     </div>
 
+    <div class="script-container">
     <pre><code id="script-content">#!/bin/bash
 
+# ============================================
 # Antigravity Geminiチャット診断スクリプト
-VERSION="1.1.0"
+# Version: 1.2.0
+# ============================================
+#
+# 【使い方】
+# 1. このスクリプトをダウンロードまたはコピー
+# 2. ターミナルで実行権限を付与: chmod +x check_antigravity_gemini.sh
+# 3. 実行: ./check_antigravity_gemini.sh
+# 4. 結果を確認し、表示される指示に従って問題を修正
+#
+# ============================================
 
-# 色付きメッセージ用の設定
+VERSION="1.2.0"
+
+# 色設定
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
 
-echo -e "${BLUE}=== Antigravity Geminiチャット診断 v${VERSION} ===${NC}"
+# 結果を保存する配列
+declare -a ERRORS_LIST
+declare -a WARNINGS_LIST
+declare -a FIXES_LIST
+
 echo ""
-echo "診断開始: $(date)"
+echo -e "${BLUE}${BOLD}╔════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BLUE}${BOLD}║   Antigravity Geminiチャット診断スクリプト v${VERSION}        ║${NC}"
+echo -e "${BLUE}${BOLD}╚════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+echo -e "診断開始: $(date '+%Y-%m-%d %H:%M:%S')"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-ERRORS=0
-WARNINGS=0
-
+# ============================================
 # 1. glibcバージョン確認
-echo -e "${BLUE}[1/7] glibcバージョン確認...${NC}"
+# ============================================
+echo -e "${BLUE}${BOLD}[1/7] glibcバージョン確認${NC}"
+echo -e "      Linuxの基本ライブラリです。Antigravityには 2.28以上が必要です。"
+echo ""
+
 GLIBC_VERSION=$(ldd --version 2>&1 | head -n1 | grep -oP '\d+\.\d+' | head -1)
 if [ -n "$GLIBC_VERSION" ]; then
     REQUIRED="2.28"
     if [ "$(printf '%s\n' "$REQUIRED" "$GLIBC_VERSION" | sort -V | head -n1)" = "$REQUIRED" ]; then
-        echo -e "${GREEN}✓ glibc $GLIBC_VERSION (>= 2.28 必須)${NC}"
+        echo -e "  ${GREEN}✓ OK: glibc $GLIBC_VERSION${NC}"
     else
-        echo -e "${RED}✗ glibc $GLIBC_VERSION - バージョンが古い (>= 2.28 必須)${NC}"
-        ((ERRORS++))
+        echo -e "  ${RED}✗ エラー: glibc $GLIBC_VERSION（2.28以上が必要）${NC}"
+        ERRORS_LIST+=("glibcのバージョンが古い ($GLIBC_VERSION)")
+        FIXES_LIST+=("【glibc】OSを新しいバージョンにアップグレードしてください（Ubuntu 20.04以上、Debian 10以上推奨）")
     fi
 else
-    echo -e "${RED}✗ glibcバージョンを取得できません${NC}"
-    ((ERRORS++))
+    echo -e "  ${RED}✗ エラー: glibcバージョンを取得できません${NC}"
+    ERRORS_LIST+=("glibcバージョン取得失敗")
 fi
 echo ""
 
-# 2. glibcxxバージョン確認
-echo -e "${BLUE}[2/7] glibcxxバージョン確認...${NC}"
-GLIBCXX_VERSION=$(strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 2>/dev/null | grep GLIBCXX | sort -V | tail -1 | grep -oP '\d+\.\d+\.\d+')
+# ============================================
+# 2. GLIBCXXバージョン確認
+# ============================================
+echo -e "${BLUE}${BOLD}[2/7] GLIBCXXバージョン確認${NC}"
+echo -e "      C++標準ライブラリです。3.4.25以上が必要です。"
+echo ""
+
+# 複数のパスを試す
+LIBSTDCXX_PATHS=(
+    "/usr/lib/x86_64-linux-gnu/libstdc++.so.6"
+    "/usr/lib64/libstdc++.so.6"
+    "/lib/x86_64-linux-gnu/libstdc++.so.6"
+)
+GLIBCXX_VERSION=""
+for libpath in "${LIBSTDCXX_PATHS[@]}"; do
+    if [ -f "$libpath" ]; then
+        GLIBCXX_VERSION=$(strings "$libpath" 2>/dev/null | grep GLIBCXX | sort -V | tail -1 | grep -oP '\d+\.\d+\.\d+')
+        break
+    fi
+done
+
 if [ -n "$GLIBCXX_VERSION" ]; then
     REQUIRED="3.4.25"
     if [ "$(printf '%s\n' "$REQUIRED" "$GLIBCXX_VERSION" | sort -V | head -n1)" = "$REQUIRED" ]; then
-        echo -e "${GREEN}✓ GLIBCXX $GLIBCXX_VERSION (>= 3.4.25 必須)${NC}"
+        echo -e "  ${GREEN}✓ OK: GLIBCXX $GLIBCXX_VERSION${NC}"
     else
-        echo -e "${RED}✗ GLIBCXX $GLIBCXX_VERSION - バージョンが古い (>= 3.4.25 必須)${NC}"
-        ((ERRORS++))
+        echo -e "  ${RED}✗ エラー: GLIBCXX $GLIBCXX_VERSION（3.4.25以上が必要）${NC}"
+        ERRORS_LIST+=("GLIBCXXのバージョンが古い ($GLIBCXX_VERSION)")
+        FIXES_LIST+=("【GLIBCXX】libstdc++を更新してください: sudo apt update && sudo apt install libstdc++6")
     fi
 else
-    echo -e "${YELLOW}△ GLIBCXXバージョンを確認できません（パスが異なる可能性）${NC}"
-    ((WARNINGS++))
+    echo -e "  ${YELLOW}△ 警告: GLIBCXXバージョンを確認できません${NC}"
+    WARNINGS_LIST+=("GLIBCXXバージョン確認失敗（パスが異なる可能性）")
 fi
 echo ""
 
+# ============================================
 # 3. Chromeブラウザ確認
-echo -e "${BLUE}[3/7] Chromeブラウザ確認...${NC}"
+# ============================================
+echo -e "${BLUE}${BOLD}[3/7] Google Chrome確認${NC}"
+echo -e "      ブラウザエージェント機能とGoogle認証に使用します。"
+echo ""
+
 CHROME_FOUND=0
 CHROME_PATH=""
+CHROME_VERSION=""
 
-# 方法1: コマンドで検出
+# 検出方法1: コマンド
 for cmd in google-chrome google-chrome-stable chrome; do
     if command -v $cmd &> /dev/null; then
         CHROME_PATH=$(command -v $cmd)
@@ -223,9 +413,9 @@ for cmd in google-chrome google-chrome-stable chrome; do
     fi
 done
 
-# 方法2: 一般的なインストールパスを確認
+# 検出方法2: 直接パス
 if [ $CHROME_FOUND -eq 0 ]; then
-    for path in /opt/google/chrome/chrome /usr/bin/google-chrome /usr/bin/google-chrome-stable; do
+    for path in /opt/google/chrome/chrome /usr/bin/google-chrome /usr/bin/google-chrome-stable /snap/bin/google-chrome; do
         if [ -x "$path" ]; then
             CHROME_PATH="$path"
             CHROME_VERSION=$("$path" --version 2>/dev/null)
@@ -235,190 +425,406 @@ if [ $CHROME_FOUND -eq 0 ]; then
     done
 fi
 
-# 方法3: snap版を確認
+# 検出方法3: snap
 if [ $CHROME_FOUND -eq 0 ] && command -v snap &> /dev/null; then
-    if snap list google-chrome 2>/dev/null | grep -q google-chrome; then
+    if snap list 2>/dev/null | grep -q "google-chrome"; then
         CHROME_PATH="snap:google-chrome"
-        CHROME_VERSION=$(snap run google-chrome --version 2>/dev/null || echo "snap版")
+        CHROME_VERSION="snap版"
         CHROME_FOUND=1
     fi
 fi
 
-# 方法4: flatpak版を確認
+# 検出方法4: flatpak
 if [ $CHROME_FOUND -eq 0 ] && command -v flatpak &> /dev/null; then
-    if flatpak list 2>/dev/null | grep -qi chrome; then
+    if flatpak list 2>/dev/null | grep -qi "chrome"; then
         CHROME_PATH="flatpak:chrome"
         CHROME_VERSION="flatpak版"
         CHROME_FOUND=1
     fi
 fi
 
-# 方法5: .desktopファイルから検索
+# 検出方法5: .desktopファイル
 if [ $CHROME_FOUND -eq 0 ]; then
     DESKTOP_FILE=$(find /usr/share/applications ~/.local/share/applications -name "*chrome*.desktop" 2>/dev/null | head -1)
     if [ -n "$DESKTOP_FILE" ]; then
         CHROME_PATH=$(grep -oP '(?<=Exec=)[^ ]+' "$DESKTOP_FILE" 2>/dev/null | head -1)
         if [ -n "$CHROME_PATH" ] && [ -x "$CHROME_PATH" ]; then
-            CHROME_VERSION=$("$CHROME_PATH" --version 2>/dev/null || echo "検出済み")
+            CHROME_VERSION="デスクトップエントリから検出"
             CHROME_FOUND=1
         fi
     fi
 fi
 
 if [ $CHROME_FOUND -eq 1 ]; then
-    echo -e "${GREEN}✓ Chrome検出: $CHROME_VERSION${NC}"
-    echo -e "${GREEN}  パス: $CHROME_PATH${NC}"
+    echo -e "  ${GREEN}✓ OK: Chrome検出${NC}"
+    echo -e "      バージョン: $CHROME_VERSION"
+    echo -e "      パス: $CHROME_PATH"
 elif command -v chromium-browser &> /dev/null || command -v chromium &> /dev/null; then
     CHROMIUM_VERSION=$(chromium-browser --version 2>/dev/null || chromium --version 2>/dev/null)
-    echo -e "${YELLOW}△ Chromium検出: $CHROMIUM_VERSION${NC}"
-    echo -e "${YELLOW}  → Google Chromeを推奨します${NC}"
-    ((WARNINGS++))
+    echo -e "  ${YELLOW}△ 警告: Chromiumを検出（$CHROMIUM_VERSION）${NC}"
+    echo -e "      → Google Chromeを推奨します"
+    WARNINGS_LIST+=("ChromiumはインストールされていますがGoogle Chromeを推奨")
 else
-    echo -e "${RED}✗ Chromeがインストールされていません${NC}"
-    echo -e "${RED}  → ブラウザエージェント機能には必須です${NC}"
-    echo -e "${YELLOW}  インストール方法:${NC}"
-    echo -e "${YELLOW}  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb${NC}"
-    echo -e "${YELLOW}  sudo dpkg -i google-chrome-stable_current_amd64.deb${NC}"
-    ((ERRORS++))
+    echo -e "  ${RED}✗ エラー: Google Chromeが見つかりません${NC}"
+    ERRORS_LIST+=("Google Chromeがインストールされていない")
+    FIXES_LIST+=("【Chrome】以下のコマンドでインストール:
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    sudo dpkg -i google-chrome-stable_current_amd64.deb
+    sudo apt-get install -f")
 fi
 echo ""
 
+# ============================================
 # 4. Antigravityインストール確認
-echo -e "${BLUE}[4/7] Antigravityインストール確認...${NC}"
+# ============================================
+echo -e "${BLUE}${BOLD}[4/7] Antigravityインストール確認${NC}"
+echo -e "      Antigravity本体がインストールされているか確認します。"
+echo ""
+
+AG_FOUND=0
+AG_PATH=""
+
 if command -v antigravity &> /dev/null; then
+    AG_PATH=$(command -v antigravity)
     AG_VERSION=$(antigravity --version 2>/dev/null || echo "バージョン取得不可")
-    echo -e "${GREEN}✓ Antigravity インストール済み: $AG_VERSION${NC}"
-elif [ -f /usr/bin/antigravity ] || [ -f /usr/local/bin/antigravity ]; then
-    echo -e "${GREEN}✓ Antigravity バイナリ検出${NC}"
+    AG_FOUND=1
+elif [ -x /usr/bin/antigravity ]; then
+    AG_PATH="/usr/bin/antigravity"
+    AG_FOUND=1
+elif [ -x /usr/local/bin/antigravity ]; then
+    AG_PATH="/usr/local/bin/antigravity"
+    AG_FOUND=1
+elif [ -x /opt/antigravity/antigravity ]; then
+    AG_PATH="/opt/antigravity/antigravity"
+    AG_FOUND=1
+fi
+
+if [ $AG_FOUND -eq 1 ]; then
+    echo -e "  ${GREEN}✓ OK: Antigravityインストール済み${NC}"
+    echo -e "      パス: $AG_PATH"
 else
-    echo -e "${RED}✗ Antigravityがインストールされていません${NC}"
-    ((ERRORS++))
+    echo -e "  ${RED}✗ エラー: Antigravityが見つかりません${NC}"
+    ERRORS_LIST+=("Antigravityがインストールされていない")
+    FIXES_LIST+=("【Antigravity】インストールスクリプトを実行してください（index.htmlを参照）")
 fi
 echo ""
 
+# ============================================
 # 5. 設定ディレクトリ確認
-echo -e "${BLUE}[5/7] 設定ディレクトリ確認...${NC}"
+# ============================================
+echo -e "${BLUE}${BOLD}[5/7] 設定ディレクトリ確認${NC}"
+echo -e "      認証情報とユーザー設定の保存場所を確認します。"
+echo ""
+
 CONFIG_DIRS=(
+    "$HOME/.config/Antigravity"
     "$HOME/.config/antigravity"
     "$HOME/.antigravity"
-    "$HOME/.config/Antigravity"
 )
 CONFIG_FOUND=0
+CONFIG_PATH=""
+
 for DIR in "${CONFIG_DIRS[@]}"; do
     if [ -d "$DIR" ]; then
-        echo -e "${GREEN}✓ 設定ディレクトリ: $DIR${NC}"
+        CONFIG_PATH="$DIR"
         CONFIG_FOUND=1
+        echo -e "  ${GREEN}✓ 設定ディレクトリ発見: $DIR${NC}"
 
-        # 認証ファイルの確認
-        if [ -f "$DIR/auth.json" ] || [ -f "$DIR/credentials.json" ] || [ -d "$DIR/User" ]; then
-            echo -e "${GREEN}  ✓ 認証/ユーザー設定あり${NC}"
-        else
-            echo -e "${YELLOW}  △ 認証ファイルが見つかりません（初回起動が必要かも）${NC}"
-            ((WARNINGS++))
+        # 中身を確認
+        if [ -d "$DIR/User" ]; then
+            echo -e "      ${GREEN}✓ ユーザー設定あり${NC}"
         fi
+
+        # 認証関連ファイルを探す
+        AUTH_FILES=$(find "$DIR" -name "*.json" -o -name "*auth*" -o -name "*credential*" 2>/dev/null | head -3)
+        if [ -n "$AUTH_FILES" ]; then
+            echo -e "      ${GREEN}✓ 認証関連ファイルあり${NC}"
+        else
+            echo -e "      ${YELLOW}△ 認証ファイルが見つかりません${NC}"
+            WARNINGS_LIST+=("認証ファイルが見つかりません - 再ログインが必要かもしれません")
+        fi
+        break
     fi
 done
+
 if [ $CONFIG_FOUND -eq 0 ]; then
-    echo -e "${YELLOW}△ 設定ディレクトリが見つかりません${NC}"
-    echo -e "${YELLOW}  → Antigravityを一度起動してセットアップしてください${NC}"
-    ((WARNINGS++))
+    echo -e "  ${YELLOW}△ 警告: 設定ディレクトリが見つかりません${NC}"
+    echo -e "      → Antigravityを一度起動してセットアップを完了してください"
+    WARNINGS_LIST+=("設定ディレクトリが存在しない - 初回セットアップが必要")
+    FIXES_LIST+=("【設定】Antigravityを起動して初回セットアップを完了してください")
 fi
 echo ""
 
+# ============================================
 # 6. ネットワーク接続確認
-echo -e "${BLUE}[6/7] ネットワーク接続確認...${NC}"
-if ping -c 1 google.com &> /dev/null; then
-    echo -e "${GREEN}✓ インターネット接続OK${NC}"
+# ============================================
+echo -e "${BLUE}${BOLD}[6/7] ネットワーク接続確認${NC}"
+echo -e "      インターネットとGemini APIへの接続を確認します。"
+echo ""
+
+# インターネット接続
+if ping -c 1 -W 3 google.com &> /dev/null; then
+    echo -e "  ${GREEN}✓ インターネット接続: OK${NC}"
 else
-    echo -e "${RED}✗ インターネット接続に問題があります${NC}"
-    ((ERRORS++))
+    echo -e "  ${RED}✗ エラー: インターネットに接続できません${NC}"
+    ERRORS_LIST+=("インターネット接続なし")
+    FIXES_LIST+=("【ネットワーク】インターネット接続を確認してください")
 fi
 
-# Gemini APIエンドポイント確認
-if curl -s --max-time 5 -o /dev/null -w "%{http_code}" https://generativelanguage.googleapis.com | grep -q "200\|403\|404"; then
-    echo -e "${GREEN}✓ Gemini APIエンドポイント到達可能${NC}"
+# Gemini APIエンドポイント
+if command -v curl &> /dev/null; then
+    HTTP_CODE=$(curl -s --max-time 5 -o /dev/null -w "%{http_code}" https://generativelanguage.googleapis.com 2>/dev/null)
+    if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "403" ] || [ "$HTTP_CODE" = "404" ]; then
+        echo -e "  ${GREEN}✓ Gemini API: 到達可能 (HTTP $HTTP_CODE)${NC}"
+    else
+        echo -e "  ${YELLOW}△ Gemini API: 応答なし (HTTP $HTTP_CODE)${NC}"
+        WARNINGS_LIST+=("Gemini APIエンドポイントへの接続を確認できません")
+    fi
 else
-    echo -e "${YELLOW}△ Gemini APIエンドポイントへの接続を確認できません${NC}"
-    ((WARNINGS++))
+    echo -e "  ${YELLOW}△ curlがないためAPI確認をスキップ${NC}"
 fi
 echo ""
 
+# ============================================
 # 7. プロセス確認
-echo -e "${BLUE}[7/7] Antigravity関連プロセス確認...${NC}"
-if pgrep -f "antigravity" > /dev/null; then
-    echo -e "${GREEN}✓ Antigravityプロセス実行中${NC}"
-    pgrep -fa "antigravity" | head -3
+# ============================================
+echo -e "${BLUE}${BOLD}[7/7] Antigravityプロセス確認${NC}"
+echo -e "      現在Antigravityが実行中か確認します。"
+echo ""
+
+AG_PROCS=$(pgrep -fa "antigravity|Antigravity" 2>/dev/null | grep -v "check_antigravity" | head -5)
+if [ -n "$AG_PROCS" ]; then
+    echo -e "  ${GREEN}✓ Antigravityプロセス実行中:${NC}"
+    echo "$AG_PROCS" | while read line; do
+        echo -e "      $line"
+    done
 else
-    echo -e "${YELLOW}△ Antigravityプロセスは実行されていません${NC}"
+    echo -e "  ${YELLOW}△ Antigravityプロセスは実行されていません${NC}"
+    echo -e "      → 診断後にAntigravityを起動してください"
 fi
 echo ""
 
-# 結果サマリー
-echo -e "${BLUE}=== 診断結果 ===${NC}"
+# ============================================
+# 診断結果サマリー
+# ============================================
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then
-    echo -e "${GREEN}✓ すべてのチェックに合格しました${NC}"
+echo -e "${BLUE}${BOLD}【診断結果サマリー】${NC}"
+echo ""
+
+ERROR_COUNT=${#ERRORS_LIST[@]}
+WARNING_COUNT=${#WARNINGS_LIST[@]}
+
+if [ $ERROR_COUNT -eq 0 ] && [ $WARNING_COUNT -eq 0 ]; then
+    echo -e "${GREEN}${BOLD}✓ すべてのチェックに合格しました！${NC}"
     echo ""
-    echo "Geminiチャットがまだ動作しない場合:"
-    echo "1. Antigravityを再起動してください"
-    echo "2. Googleアカウントで再ログインしてください"
-    echo "3. 個人Gmailアカウントを使用しているか確認してください"
-elif [ $ERRORS -eq 0 ]; then
-    echo -e "${YELLOW}△ $WARNINGS 件の警告があります${NC}"
-    echo "上記の警告を確認してください"
+    echo -e "システム環境に問題は見つかりませんでした。"
+    echo -e "それでもGeminiチャットが動作しない場合は、以下を試してください："
+    echo ""
+    echo -e "${CYAN}【次のステップ】${NC}"
+    echo -e "  1. Antigravityを完全に終了して再起動"
+    echo -e "  2. 右下のプロフィールアイコン → Sign Out → Sign In"
+    echo -e "  3. ${BOLD}個人のGmailアカウント${NC}(@gmail.com)でログイン"
+    echo -e "     ※ 組織アカウント(会社・学校)では動作しません"
+    echo -e "  4. チャット欄で「continue」と入力してみる"
+    echo ""
+elif [ $ERROR_COUNT -eq 0 ]; then
+    echo -e "${YELLOW}${BOLD}△ ${WARNING_COUNT}件の警告があります${NC}"
+    echo ""
+    echo "警告一覧:"
+    for i in "${!WARNINGS_LIST[@]}"; do
+        echo -e "  ${YELLOW}$((i+1)). ${WARNINGS_LIST[$i]}${NC}"
+    done
+    echo ""
+    echo -e "警告は必ずしも問題ではありませんが、確認することをお勧めします。"
 else
-    echo -e "${RED}✗ $ERRORS 件のエラー、$WARNINGS 件の警告${NC}"
+    echo -e "${RED}${BOLD}✗ ${ERROR_COUNT}件のエラー、${WARNING_COUNT}件の警告${NC}"
     echo ""
-    echo "推奨アクション:"
-    echo "1. エラー項目を修正してください"
-    echo "2. 修正後、再度このスクリプトを実行してください"
+
+    if [ $ERROR_COUNT -gt 0 ]; then
+        echo -e "${RED}エラー一覧:${NC}"
+        for i in "${!ERRORS_LIST[@]}"; do
+            echo -e "  ${RED}$((i+1)). ${ERRORS_LIST[$i]}${NC}"
+        done
+        echo ""
+    fi
+
+    if [ $WARNING_COUNT -gt 0 ]; then
+        echo -e "${YELLOW}警告一覧:${NC}"
+        for i in "${!WARNINGS_LIST[@]}"; do
+            echo -e "  ${YELLOW}$((i+1)). ${WARNINGS_LIST[$i]}${NC}"
+        done
+        echo ""
+    fi
+fi
+
+# 修正手順を表示
+if [ ${#FIXES_LIST[@]} -gt 0 ]; then
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${BLUE}${BOLD}【修正手順】${NC}"
+    echo ""
+    for i in "${!FIXES_LIST[@]}"; do
+        echo -e "${BOLD}$((i+1)). ${FIXES_LIST[$i]}${NC}"
+        echo ""
+    done
+    echo -e "修正後、このスクリプトを再実行して確認してください。"
 fi
 
 echo ""
-echo "診断完了: $(date)"</code></pre>
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "診断完了: $(date '+%Y-%m-%d %H:%M:%S')"
+echo ""</code></pre>
+    </div>
 
-    <h2>使い方</h2>
-    <div class="info-box" style="border-color: #1f6feb; border-left-color: #1f6feb;">
-        <h3>実行方法</h3>
-        <p><strong>方法1:</strong> ダウンロードして実行</p>
-        <pre style="margin: 10px 0;"><code>chmod +x check_antigravity_gemini.sh
+    <h3>実行方法</h3>
+    <div class="step-card">
+        <div class="flow-step">
+            <div class="flow-dot"></div>
+            <div class="flow-content">
+                <strong>ステップ1:</strong> 上のボタンでスクリプトをダウンロードまたはコピー
+            </div>
+        </div>
+        <div class="flow-step">
+            <div class="flow-dot"></div>
+            <div class="flow-content">
+                <strong>ステップ2:</strong> ターミナルを開いて以下を実行
+                <pre style="margin-top: 10px;"><code># ダウンロードした場合
+chmod +x check_antigravity_gemini.sh
+./check_antigravity_gemini.sh
+
+# コピーした場合
+nano check_antigravity_gemini.sh  # 貼り付けて保存
+chmod +x check_antigravity_gemini.sh
 ./check_antigravity_gemini.sh</code></pre>
-
-        <p><strong>方法2:</strong> ワンライナーで実行</p>
-        <pre style="margin: 10px 0;"><code>curl -fsSL [このページのURL]/check_antigravity_gemini.sh | bash</code></pre>
+            </div>
+        </div>
+        <div class="flow-step">
+            <div class="flow-dot"></div>
+            <div class="flow-content">
+                <strong>ステップ3:</strong> 結果を確認し、表示される指示に従って問題を修正
+            </div>
+        </div>
     </div>
 
-    <h2>よくある解決策</h2>
-    <div class="info-box" style="border-color: #d29922; border-left-color: #d29922;">
-        <h3>Chromeがない場合</h3>
-        <pre style="margin: 10px 0;"><code>wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    <!-- ============================================ -->
+    <h2>3. よくある問題と解決方法</h2>
+    <!-- ============================================ -->
+
+    <div class="solution-card error">
+        <div class="solution-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">
+            <span class="solution-icon">🔴</span>
+            <span class="solution-title">glibc / GLIBCXXのバージョンが古い</span>
+            <span class="solution-arrow">▼</span>
+        </div>
+        <div class="solution-content">
+            <p><strong>原因:</strong> OSが古いバージョンのため、必要なライブラリがありません。</p>
+            <p><strong>必要なバージョン:</strong></p>
+            <ul>
+                <li>glibc 2.28以上（Ubuntu 20.04、Debian 10以上に含まれる）</li>
+                <li>GLIBCXX 3.4.25以上</li>
+            </ul>
+            <p><strong>解決方法:</strong></p>
+            <pre><code># OSのアップグレード（推奨）
+sudo apt update && sudo apt upgrade -y
+sudo do-release-upgrade  # Ubuntuの場合
+
+# または libstdc++の更新
+sudo apt install libstdc++6</code></pre>
+        </div>
+    </div>
+
+    <div class="solution-card error">
+        <div class="solution-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">
+            <span class="solution-icon">🔴</span>
+            <span class="solution-title">Google Chromeがインストールされていない</span>
+            <span class="solution-arrow">▼</span>
+        </div>
+        <div class="solution-content">
+            <p><strong>原因:</strong> AntigravityはGoogle認証とブラウザエージェント機能にChromeを使用します。</p>
+            <p><strong>解決方法:</strong></p>
+            <pre><code># Google Chromeをインストール
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+# 依存関係エラーが出た場合
 sudo apt-get install -f</code></pre>
+        </div>
     </div>
 
-    <div class="info-box" style="border-color: #d29922; border-left-color: #d29922;">
-        <h3>Googleアカウント再認証</h3>
-        <ol>
-            <li>Antigravityを起動</li>
-            <li>右下のプロフィールアイコンをクリック</li>
-            <li>「Sign Out」→「Sign In」で再ログイン</li>
-            <li><strong>個人Gmail</strong>アカウントを使用（組織アカウント不可）</li>
-        </ol>
+    <div class="solution-card warning">
+        <div class="solution-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">
+            <span class="solution-icon">🟡</span>
+            <span class="solution-title">認証ファイルが見つからない / ログインできない</span>
+            <span class="solution-arrow">▼</span>
+        </div>
+        <div class="solution-content">
+            <p><strong>原因:</strong> Googleアカウントでのログインが完了していないか、認証情報が破損しています。</p>
+            <p><strong>重要:</strong> <span style="color: #f85149; font-weight: bold;">個人のGmailアカウント（@gmail.com）が必須です。</span><br>
+            会社や学校のGoogle Workspaceアカウントでは動作しません。</p>
+            <p><strong>解決方法:</strong></p>
+            <ol>
+                <li>Antigravityを起動</li>
+                <li>右下のプロフィールアイコンをクリック</li>
+                <li>「Sign Out」をクリック</li>
+                <li>「Sign In」をクリック</li>
+                <li><strong>個人のGmail</strong>アカウントでログイン</li>
+            </ol>
+            <p><strong>それでもダメな場合（設定リセット）:</strong></p>
+            <pre><code># 設定をバックアップしてリセット
+mv ~/.config/Antigravity ~/.config/Antigravity.backup
+# Antigravityを再起動して最初からセットアップ</code></pre>
+        </div>
     </div>
 
-    <div class="info-box" style="border-color: #d29922; border-left-color: #d29922;">
-        <h3>設定リセット</h3>
-        <pre style="margin: 10px 0;"><code># 設定をバックアップしてリセット
-mv ~/.config/antigravity ~/.config/antigravity.backup
-# Antigravityを再起動して初期設定をやり直す</code></pre>
+    <div class="solution-card warning">
+        <div class="solution-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">
+            <span class="solution-icon">🟡</span>
+            <span class="solution-title">チャットが固まる / 応答しない</span>
+            <span class="solution-arrow">▼</span>
+        </div>
+        <div class="solution-content">
+            <p><strong>原因:</strong> エージェントが処理中に停止することがあります。</p>
+            <p><strong>解決方法:</strong></p>
+            <ol>
+                <li>チャット欄に <code>continue</code> または <code>proceed</code> と入力</li>
+                <li>それでも動かない場合: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → 「Restart Agent Service」</li>
+                <li>最終手段: Antigravityを完全に終了して再起動</li>
+            </ol>
+            <p><strong>モデルを変更する:</strong></p>
+            <p>右下のモデルセレクターで、より軽いモデル（Gemini 3 Pro Standard）に切り替えてみてください。</p>
+        </div>
+    </div>
+
+    <div class="solution-card info">
+        <div class="solution-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">
+            <span class="solution-icon">🔵</span>
+            <span class="solution-title">すべてOKなのに動かない</span>
+            <span class="solution-arrow">▼</span>
+        </div>
+        <div class="solution-content">
+            <p>診断スクリプトで問題が見つからない場合は、以下を順番に試してください:</p>
+            <ol>
+                <li><strong>Antigravityを完全に終了して再起動</strong></li>
+                <li><strong>Googleアカウントで再ログイン</strong>（個人Gmail必須）</li>
+                <li><strong>Chrome拡張機能の確認</strong>: Antigravityの指示に従って拡張機能をインストール</li>
+                <li><strong>ファイアウォール/プロキシの確認</strong>: 会社ネットワークでブロックされている可能性</li>
+                <li><strong>VPNを使用している場合</strong>: 一度オフにして試す</li>
+            </ol>
+            <p><strong>バグ報告:</strong></p>
+            <ul>
+                <li>Antigravity内: プロフィールアイコン → 「Report Issue」</li>
+                <li>Agent Manager内: 「Provide Feedback」リンク</li>
+            </ul>
+        </div>
     </div>
 
     <div class="sources">
         <strong>参考情報:</strong>
         <ul>
             <li><a href="https://codelabs.developers.google.com/getting-started-google-antigravity" target="_blank">Getting Started with Google Antigravity | Google Codelabs</a></li>
+            <li><a href="https://antigravity.codes/troubleshooting" target="_blank">Troubleshooting Google Antigravity</a></li>
             <li><a href="https://antigravity.codes/download" target="_blank">Download Google Antigravity</a></li>
-            <li><a href="https://habr.com/en/articles/969772/" target="_blank">Google Antigravity IDE Explained | Habr</a></li>
         </ul>
     </div>
 
@@ -430,7 +836,7 @@ mv ~/.config/antigravity ~/.config/antigravity.backup
                 btn.textContent = '✓ コピーしました！';
                 btn.classList.add('copied');
                 setTimeout(() => {
-                    btn.textContent = '📋 コピー';
+                    btn.textContent = '📋 スクリプトをコピー';
                     btn.classList.remove('copied');
                 }, 2000);
             });
