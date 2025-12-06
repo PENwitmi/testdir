@@ -196,18 +196,75 @@ echo ""
 
 # 3. Chromeブラウザ確認
 echo -e "${BLUE}[3/7] Chromeブラウザ確認...${NC}"
-if command -v google-chrome &> /dev/null || command -v google-chrome-stable &> /dev/null; then
-    CHROME_VERSION=$(google-chrome --version 2>/dev/null || google-chrome-stable --version 2>/dev/null)
-    echo -e "${GREEN}✓ $CHROME_VERSION${NC}"
-elif command -v chromium-browser &> /dev/null; then
-    CHROMIUM_VERSION=$(chromium-browser --version 2>/dev/null)
+CHROME_FOUND=0
+CHROME_PATH=""
+
+# 方法1: コマンドで検出
+for cmd in google-chrome google-chrome-stable chrome; do
+    if command -v $cmd &> /dev/null; then
+        CHROME_PATH=$(command -v $cmd)
+        CHROME_VERSION=$($cmd --version 2>/dev/null)
+        CHROME_FOUND=1
+        break
+    fi
+done
+
+# 方法2: 一般的なインストールパスを確認
+if [ $CHROME_FOUND -eq 0 ]; then
+    for path in /opt/google/chrome/chrome /usr/bin/google-chrome /usr/bin/google-chrome-stable; do
+        if [ -x "$path" ]; then
+            CHROME_PATH="$path"
+            CHROME_VERSION=$("$path" --version 2>/dev/null)
+            CHROME_FOUND=1
+            break
+        fi
+    done
+fi
+
+# 方法3: snap版を確認
+if [ $CHROME_FOUND -eq 0 ] && command -v snap &> /dev/null; then
+    if snap list google-chrome 2>/dev/null | grep -q google-chrome; then
+        CHROME_PATH="snap:google-chrome"
+        CHROME_VERSION=$(snap run google-chrome --version 2>/dev/null || echo "snap版")
+        CHROME_FOUND=1
+    fi
+fi
+
+# 方法4: flatpak版を確認
+if [ $CHROME_FOUND -eq 0 ] && command -v flatpak &> /dev/null; then
+    if flatpak list 2>/dev/null | grep -qi chrome; then
+        CHROME_PATH="flatpak:chrome"
+        CHROME_VERSION="flatpak版"
+        CHROME_FOUND=1
+    fi
+fi
+
+# 方法5: .desktopファイルから検索
+if [ $CHROME_FOUND -eq 0 ]; then
+    DESKTOP_FILE=$(find /usr/share/applications ~/.local/share/applications -name "*chrome*.desktop" 2>/dev/null | head -1)
+    if [ -n "$DESKTOP_FILE" ]; then
+        CHROME_PATH=$(grep -oP '(?<=Exec=)[^ ]+' "$DESKTOP_FILE" 2>/dev/null | head -1)
+        if [ -n "$CHROME_PATH" ] && [ -x "$CHROME_PATH" ]; then
+            CHROME_VERSION=$("$CHROME_PATH" --version 2>/dev/null || echo "検出済み")
+            CHROME_FOUND=1
+        fi
+    fi
+fi
+
+if [ $CHROME_FOUND -eq 1 ]; then
+    echo -e "${GREEN}✓ Chrome検出: $CHROME_VERSION${NC}"
+    echo -e "${GREEN}  パス: $CHROME_PATH${NC}"
+elif command -v chromium-browser &> /dev/null || command -v chromium &> /dev/null; then
+    CHROMIUM_VERSION=$(chromium-browser --version 2>/dev/null || chromium --version 2>/dev/null)
     echo -e "${YELLOW}△ Chromium検出: $CHROMIUM_VERSION${NC}"
     echo -e "${YELLOW}  → Google Chromeを推奨します${NC}"
     ((WARNINGS++))
 else
     echo -e "${RED}✗ Chromeがインストールされていません${NC}"
-    echo -e "${RED}  → Geminiチャットには必須です${NC}"
-    echo -e "${YELLOW}  インストール: sudo apt install google-chrome-stable${NC}"
+    echo -e "${RED}  → ブラウザエージェント機能には必須です${NC}"
+    echo -e "${YELLOW}  インストール方法:${NC}"
+    echo -e "${YELLOW}  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb${NC}"
+    echo -e "${YELLOW}  sudo dpkg -i google-chrome-stable_current_amd64.deb${NC}"
     ((ERRORS++))
 fi
 echo ""
